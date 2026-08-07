@@ -93,6 +93,14 @@
   border-color: #fff;
 }
 
+.version {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 11px;
+  color: #555;
+  letter-spacing: 0.05em;
+}
+
 .content {
   flex: 1;
   padding: 32px 36px;
