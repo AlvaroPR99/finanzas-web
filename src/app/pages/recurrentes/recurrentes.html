@@ -24,45 +24,47 @@
     } @else if (recurrentes().length === 0) {
       <p class="empty">No hay recurrentes configurados.</p>
     } @else {
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Día</th>
-            <th>Descripción</th>
-            <th>Categoría</th>
-            <th>Tipo</th>
-            <th class="num">Importe</th>
-            <th>Estado</th>
-            <th class="actions"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (r of recurrentes(); track r.id) {
-            <tr [class.inactive]="!r.activo">
-              <td class="mono">Día {{ r.diaDelMes }}</td>
-              <td>{{ r.descripcion || '—' }}</td>
-              <td>
-                @if (r.categoria) {
-                  <span class="cat"><span class="cat-icon">{{ r.categoria.icono }}</span> {{ r.categoria.nombre }}</span>
-                } @else { — }
-              </td>
-              <td>
-                @if (r.tipo === 'GASTO') {
-                  <span class="tag">{{ r.tipoGasto === 'FIJO' ? 'Fijo' : 'Variable' }}</span>
-                } @else {
-                  <span class="tag">Ingreso</span>
-                }
-              </td>
-              <td class="num"><strong>{{ r.monto | number: '1.2-2' }} €</strong></td>
-              <td><span class="dot" [class.on]="r.activo"></span> {{ r.activo ? 'Activo' : 'Inactivo' }}</td>
-              <td class="actions">
-                <button class="icon-btn" title="Editar" (click)="abrirEditar(r)">✎</button>
-                <button class="icon-btn danger" title="Eliminar" (click)="eliminar(r)">✕</button>
-              </td>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Día</th>
+              <th>Descripción</th>
+              <th>Categoría</th>
+              <th>Tipo</th>
+              <th class="num">Importe</th>
+              <th>Estado</th>
+              <th class="actions"></th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (r of recurrentes(); track r.id) {
+              <tr [class.inactive]="!r.activo">
+                <td class="mono">Día {{ r.diaDelMes }}</td>
+                <td>{{ r.descripcion || '—' }}</td>
+                <td>
+                  @if (r.categoria) {
+                    <span class="cat"><span class="cat-icon">{{ r.categoria.icono }}</span> {{ r.categoria.nombre }}</span>
+                  } @else { — }
+                </td>
+                <td>
+                  @if (r.tipo === 'GASTO') {
+                    <span class="tag">{{ r.tipoGasto === 'FIJO' ? 'Fijo' : 'Variable' }}</span>
+                  } @else {
+                    <span class="tag">Ingreso</span>
+                  }
+                </td>
+                <td class="num"><strong>{{ r.monto | number: '1.2-2' }} €</strong></td>
+                <td><span class="dot" [class.on]="r.activo"></span> {{ r.activo ? 'Activo' : 'Inactivo' }}</td>
+                <td class="actions">
+                  <button class="icon-btn" title="Editar" (click)="abrirEditar(r)">✎</button>
+                  <button class="icon-btn danger" title="Eliminar" (click)="eliminar(r)">✕</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     }
   </section>
 

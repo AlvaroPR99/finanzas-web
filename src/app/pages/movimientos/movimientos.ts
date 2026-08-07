@@ -12,15 +12,16 @@ interface Config {
   montoField: 'monto' | 'montoInvertido';
   hasTipoGasto: boolean;
   hasPorcentaje: boolean;
+  agruparPorMes: boolean;
   endpoint: string;
   subtitle: string;
 }
 
 const CONFIGS: Record<string, Config> = {
-  INGRESO: { tipo: 'INGRESO', title: 'Ingresos', montoLabel: 'Importe', montoField: 'monto', hasTipoGasto: false, hasPorcentaje: false, endpoint: 'ingresos', subtitle: 'Dinero que entra' },
-  GASTO: { tipo: 'GASTO', title: 'Gastos', montoLabel: 'Importe', montoField: 'monto', hasTipoGasto: true, hasPorcentaje: false, endpoint: 'gastos', subtitle: 'Dinero que sale' },
-  AHORRO: { tipo: 'AHORRO', title: 'Ahorros', montoLabel: 'Importe', montoField: 'monto', hasTipoGasto: false, hasPorcentaje: false, endpoint: 'ahorros', subtitle: 'Dinero apartado' },
-  INVERSION: { tipo: 'INVERSION', title: 'Inversiones', montoLabel: 'Monto invertido', montoField: 'montoInvertido', hasTipoGasto: false, hasPorcentaje: true, endpoint: 'inversiones', subtitle: 'Dinero invertido y su rentabilidad' },
+  INGRESO: { tipo: 'INGRESO', title: 'Ingresos', montoLabel: 'Importe', montoField: 'monto', hasTipoGasto: false, hasPorcentaje: false, agruparPorMes: true, endpoint: 'ingresos', subtitle: 'Dinero que entra' },
+  GASTO: { tipo: 'GASTO', title: 'Gastos', montoLabel: 'Importe', montoField: 'monto', hasTipoGasto: true, hasPorcentaje: false, agruparPorMes: true, endpoint: 'gastos', subtitle: 'Dinero que sale' },
+  AHORRO: { tipo: 'AHORRO', title: 'Ahorros', montoLabel: 'Importe', montoField: 'monto', hasTipoGasto: false, hasPorcentaje: false, agruparPorMes: true, endpoint: 'ahorros', subtitle: 'Dinero apartado' },
+  INVERSION: { tipo: 'INVERSION', title: 'Inversiones', montoLabel: 'Monto invertido', montoField: 'montoInvertido', hasTipoGasto: false, hasPorcentaje: true, agruparPorMes: false, endpoint: 'inversiones', subtitle: 'Dinero invertido y su rentabilidad' },
 };
 
 interface Row {
@@ -61,6 +62,7 @@ export class MovimientosComponent implements OnInit {
   rows = signal<Row[]>([]);
   grupos = signal<MesGrupo[]>([]);
   total = signal(0);
+  totalActual = signal(0);
   loading = signal(true);
   error = signal('');
   saving = signal(false);
@@ -105,8 +107,9 @@ export class MovimientosComponent implements OnInit {
       next: (list: any[]) => {
         const rows = list.map(i => this.toRow(i));
         this.rows.set(rows);
-        this.grupos.set(this.agruparPorMes(rows));
+        this.grupos.set(this.config.agruparPorMes ? this.agruparPorMes(rows) : this.agruparInversiones(rows));
         this.total.set(rows.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0));
+        this.totalActual.set(rows.reduce((acc, r) => acc + (r.valorActual ?? 0), 0));
         this.loading.set(false);
       },
       error: () => {
@@ -114,6 +117,17 @@ export class MovimientosComponent implements OnInit {
         this.error.set('No se pudieron cargar los datos');
       },
     });
+  }
+
+  private agruparInversiones(rows: Row[]): MesGrupo[] {
+    const ordenadas = [...rows].sort((a, b) => b.fecha.localeCompare(a.fecha));
+    return [{
+      clave: 'inversiones',
+      etiqueta: 'Todas las inversiones',
+      esActual: false,
+      registros: ordenadas,
+      total: ordenadas.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0),
+    }];
   }
 
   private etiquetaMes(clave: string): string {

@@ -16,7 +16,19 @@
   <section class="panel">
     <div class="table-head">
       <span>{{ rows().length }} registros</span>
-      <span class="total">Total: <strong>{{ total() | number: '1.2-2' }} €</strong></span>
+      @if (config.agruparPorMes) {
+        <span class="total">Total: <strong>{{ total() | number: '1.2-2' }} €</strong></span>
+      } @else {
+        <span class="total">
+          Total invertido: <span class="total-inv">{{ total() | number: '1.2-2' }} €</span>
+          <span class="total-sep">·</span>
+          Valor actual: <strong>{{ totalActual() | number: '1.2-2' }} €</strong>
+          <span class="total-sep">·</span>
+          <span class="ganancia" [class.neg]="(totalActual() - total()) < 0">
+            {{ (totalActual() - total()) >= 0 ? '+' : '' }}{{ (totalActual() - total()) | number: '1.2-2' }} €
+          </span>
+        </span>
+      }
     </div>
 
     @if (loading()) {
@@ -26,57 +38,60 @@
     } @else {
       @for (g of grupos(); track g.clave) {
         <div class="mes-grupo">
-          <div class="mes-head">
-            <span class="mes-titulo">
-              {{ g.etiqueta }}
-              @if (g.esActual) { <span class="tag tag-actual">Este mes</span> }
-            </span>
-            <span class="mes-total"><strong>{{ g.total | number: '1.2-2' }} €</strong></span>
-          </div>
+          @if (config.agruparPorMes) {
+            <div class="mes-head">
+              <span class="mes-titulo">
+                {{ g.etiqueta }}
+                @if (g.esActual) { <span class="tag tag-actual">Este mes</span> }
+              </span>
+              <span class="mes-total"><strong>{{ g.total | number: '1.2-2' }} €</strong></span>
+            </div>
+          }
 
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Descripción</th>
-                <th>Categoría</th>
-                @if (config.hasTipoGasto) { <th>Tipo</th> }
-                <th class="num">{{ config.montoLabel }}</th>
-                @if (config.hasPorcentaje) {
-                  <th class="num">%</th>
-                  <th class="num">Valor actual</th>
-                }
-                <th class="actions"></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of g.registros; track row.id) {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
                 <tr>
-                  <td class="mono">{{ row.fecha }}</td>
-                  <td>{{ row.descripcion || '—' }}</td>
-                  <td>
-                    @if (row.categoria) {
-                      <span class="cat"><span class="cat-icon">{{ row.categoria.icono }}</span> {{ row.categoria.nombre }}</span>
-                    } @else { — }
-                  </td>
-                  @if (config.hasTipoGasto) {
-                    <td><span class="tag">{{ row.tipoGasto === 'FIJO' ? 'Fijo' : 'Variable' }}</span></td>
-                  }
-                  <td class="num"><strong>{{ row.monto | number: '1.2-2' }} €</strong></td>
+                  <th>Fecha</th>
+                  <th>Descripción</th>
+                  <th>Categoría</th>
+                  @if (config.hasTipoGasto) { <th>Tipo</th> }
+                  <th class="num">{{ config.montoLabel }}</th>
                   @if (config.hasPorcentaje) {
-                    <td class="num" [class.pos]="(row.porcentaje ?? 0) >= 0" [class.neg]="(row.porcentaje ?? 0) < 0">
-                      {{ row.porcentaje }}%
-                    </td>
-                    <td class="num">{{ row.valorActual | number: '1.2-2' }} €</td>
+                    <th class="num">%</th>
+                    <th class="num">Valor actual</th>
                   }
-                  <td class="actions">
-                    <button class="icon-btn" title="Editar" (click)="abrirEditar(row)">✎</button>
-                    <button class="icon-btn danger" title="Eliminar" (click)="eliminar(row)">✕</button>
-                  </td>
+                  <th class="actions"></th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (row of g.registros; track row.id) {
+                  <tr>
+                    <td class="mono">{{ row.fecha }}</td>
+                    <td>{{ row.descripcion || '—' }}</td>
+                    <td>
+                      @if (row.categoria) {
+                        <span class="cat"><span class="cat-icon">{{ row.categoria.icono }}</span> {{ row.categoria.nombre }}</span>
+                      } @else { — }
+                    </td>
+                    @if (config.hasTipoGasto) {
+                      <td><span class="tag">{{ row.tipoGasto === 'FIJO' ? 'Fijo' : 'Variable' }}</span></td>
+                    }
+                    <td class="num"><strong>{{ row.monto | number: '1.2-2' }} €</strong></td>
+                    @if (config.hasPorcentaje) {
+                      <td class="num" [class.pos]="(row.porcentaje ?? 0) >= 0" [class.neg]="(row.porcentaje ?? 0) < 0">
+                        {{ row.porcentaje }}%
+                      </td>
+                      <td class="num">{{ row.valorActual | number: '1.2-2' }} €</td>                    }
+                    <td class="actions">
+                      <button class="icon-btn" title="Editar" (click)="abrirEditar(row)">✎</button>
+                      <button class="icon-btn danger" title="Eliminar" (click)="eliminar(row)">✕</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
       }
     }

@@ -1,5 +1,13 @@
 <div class="layout">
-  <aside class="sidebar">
+  <button class="menu-toggle" (click)="toggleMenu()" aria-label="Abrir menú">
+    <span></span><span></span><span></span>
+  </button>
+
+  @if (menuAbierto()) {
+    <div class="overlay" (click)="toggleMenu()"></div>
+  }
+
+  <aside class="sidebar" [class.open]="menuAbierto()">
     <div class="brand">
       <span class="brand-icon">💰</span>
       <span class="brand-text">Finanzas</span>
@@ -20,6 +28,7 @@
         <div class="user-role">Saldo inicial: {{ auth.user()?.saldoInicial }} €</div>
       </div>
       <button class="logout" (click)="logout()">Salir</button>
+      <div class="version">v1.1</div>
     </div>
   </aside>
 

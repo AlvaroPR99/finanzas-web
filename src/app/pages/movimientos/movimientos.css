@@ -121,10 +121,35 @@ input:focus, select:focus {
   color: #000;
 }
 
+.total-inv {
+  color: #aaa;
+  font-weight: 400;
+}
+
+.total-sep {
+  margin: 0 6px;
+  color: #ccc;
+}
+
+.ganancia {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.ganancia.neg {
+  color: #c62828;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mes-grupo {
@@ -233,8 +258,8 @@ input:focus, select:focus {
   letter-spacing: 0.04em;
 }
 
-.pos { color: #000; }
-.neg { color: #888; }
+.pos { color: #2e7d32; }
+.neg { color: #c62828; }
 
 .icon-btn {
   background: none;
@@ -312,4 +337,50 @@ input:focus, select:focus {
   margin: 0 0 14px;
   font-size: 12px;
   color: #c62828;
+}
+
+@media (max-width: 768px) {
+  .page-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-head .btn {
+    width: 100%;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .table-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .total {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    width: 100%;
+  }
+
+  .form-actions .btn {
+    flex: 1;
+  }
+
+  .modal {
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+  }
 }

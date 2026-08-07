@@ -227,3 +227,36 @@ h1 {
   background: #000;
   color: #fff;
 }
+
+@media (max-width: 768px) {
+  .page-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-head .btn-secondary {
+    width: 100%;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .charts {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-wide {
+    grid-column: 1;
+  }
+
+  .chart-canvas {
+    height: 220px;
+  }
+
+  .modal {
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+  }
+}
