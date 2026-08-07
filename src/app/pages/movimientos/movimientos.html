@@ -16,7 +16,19 @@
   <section class="panel">
     <div class="table-head">
       <span>{{ rows().length }} registros</span>
-      <span class="total">Total: <strong>{{ total() | number: '1.2-2' }} €</strong></span>
+      @if (config.agruparPorMes) {
+        <span class="total">Total: <strong>{{ total() | number: '1.2-2' }} €</strong></span>
+      } @else {
+        <span class="total">
+          Total invertido: <strong>{{ total() | number: '1.2-2' }} €</strong>
+          <span class="total-sep">·</span>
+          Valor actual: <strong>{{ totalActual() | number: '1.2-2' }} €</strong>
+          <span class="total-sep">·</span>
+          <span class="ganancia" [class.neg]="(totalActual() - total()) < 0">
+            {{ (totalActual() - total()) >= 0 ? '+' : '' }}{{ (totalActual() - total()) | number: '1.2-2' }} €
+          </span>
+        </span>
+      }
     </div>
 
     @if (loading()) {
@@ -26,13 +38,15 @@
     } @else {
       @for (g of grupos(); track g.clave) {
         <div class="mes-grupo">
-          <div class="mes-head">
-            <span class="mes-titulo">
-              {{ g.etiqueta }}
-              @if (g.esActual) { <span class="tag tag-actual">Este mes</span> }
-            </span>
-            <span class="mes-total"><strong>{{ g.total | number: '1.2-2' }} €</strong></span>
-          </div>
+          @if (config.agruparPorMes) {
+            <div class="mes-head">
+              <span class="mes-titulo">
+                {{ g.etiqueta }}
+                @if (g.esActual) { <span class="tag tag-actual">Este mes</span> }
+              </span>
+              <span class="mes-total"><strong>{{ g.total | number: '1.2-2' }} €</strong></span>
+            </div>
+          }
 
           <div class="table-wrap">
             <table class="table">
