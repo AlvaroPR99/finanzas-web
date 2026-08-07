@@ -127,7 +127,7 @@ input:focus, select:focus {
 }
 
 .ganancia {
-  color: #111;
+  color: #2e7d32;
   font-weight: 700;
 }
 
@@ -253,8 +253,8 @@ input:focus, select:focus {
   letter-spacing: 0.04em;
 }
 
-.pos { color: #000; }
-.neg { color: #888; }
+.pos { color: #2e7d32; }
+.neg { color: #c62828; }
 
 .icon-btn {
   background: none;
