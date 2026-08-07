@@ -82,9 +82,7 @@
                       <td class="num" [class.pos]="(row.porcentaje ?? 0) >= 0" [class.neg]="(row.porcentaje ?? 0) < 0">
                         {{ row.porcentaje }}%
                       </td>
-                      <td class="num" [class.pos]="(row.valorActual ?? 0) >= (row.monto ?? 0)" [class.neg]="(row.valorActual ?? 0) < (row.monto ?? 0)">
-                      {{ row.valorActual | number: '1.2-2' }} €
-                    </td>                    }
+                      <td class="num">{{ row.valorActual | number: '1.2-2' }} €</td>                    }
                     <td class="actions">
                       <button class="icon-btn" title="Editar" (click)="abrirEditar(row)">✎</button>
                       <button class="icon-btn danger" title="Eliminar" (click)="eliminar(row)">✕</button>
