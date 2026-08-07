@@ -20,7 +20,7 @@
         <span class="total">Total: <strong>{{ total() | number: '1.2-2' }} €</strong></span>
       } @else {
         <span class="total">
-          Total invertido: <strong>{{ total() | number: '1.2-2' }} €</strong>
+          Total invertido: <span class="total-inv">{{ total() | number: '1.2-2' }} €</span>
           <span class="total-sep">·</span>
           Valor actual: <strong>{{ totalActual() | number: '1.2-2' }} €</strong>
           <span class="total-sep">·</span>
