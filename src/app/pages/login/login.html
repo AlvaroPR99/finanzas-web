@@ -1,0 +1,30 @@
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">💰</div>
+    <h1>Finanzas</h1>
+    <p class="auth-sub">Accede a tu panel económico</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label>
+        Usuario
+        <input formControlName="username" type="text" autocomplete="username" placeholder="Tu usuario" />
+      </label>
+      <label>
+        Contraseña
+        <input formControlName="password" type="password" autocomplete="current-password" placeholder="Tu contraseña" />
+      </label>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="form.invalid || loading()">
+        {{ loading() ? 'Entrando…' : 'Entrar' }}
+      </button>
+    </form>
+
+    <p class="auth-alt">
+      ¿No tienes cuenta? <a routerLink="/register">Regístrate</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,104 @@
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 48px 12px;
+}
+
+.auth-logo {
+  font-size: 44px;
+  text-align: center;
+}
+
+h1 {
+  text-align: center;
+  margin: 12px 0 4px;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.auth-sub {
+  text-align: center;
+  color: #999;
+  margin: 0 0 32px;
+  font-size: 14px;
+}
+
+label {
+  display: block;
+  margin-bottom: 18px;
+  color: #333;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+input {
+  width: 100%;
+  padding: 11px 0;
+  margin-top: 6px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  border-radius: 0;
+  font-size: 15px;
+  background: transparent;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+input:focus {
+  outline: none;
+  border-bottom-color: #000;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+button:hover:not(:disabled) {
+  background: #333;
+}
+
+button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #d00000;
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+.auth-alt {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13px;
+  color: #888;
+}
+
+a {
+  color: #000;
+  font-weight: 600;
+  text-decoration: underline;
+}

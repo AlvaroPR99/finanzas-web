@@ -1,0 +1,34 @@
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">💰</div>
+    <h1>Crear cuenta</h1>
+    <p class="auth-sub">Empieza a controlar tu dinero</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label>
+        Usuario
+        <input formControlName="username" type="text" autocomplete="username" placeholder="Elige tu usuario" />
+      </label>
+      <label>
+        Contraseña
+        <input formControlName="password" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres" />
+      </label>
+      <label>
+        Saldo inicial (€)
+        <input formControlName="saldoInicial" type="number" step="0.01" placeholder="Ej: 5000" />
+      </label>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="form.invalid || loading()">
+        {{ loading() ? 'Creando…' : 'Crear cuenta' }}
+      </button>
+    </form>
+
+    <p class="auth-alt">
+      ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
+    </p>
+  </div>
+</div>

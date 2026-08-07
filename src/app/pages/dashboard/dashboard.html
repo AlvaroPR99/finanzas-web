@@ -1,0 +1,99 @@
+<div class="dashboard">
+  <header class="page-head">
+    <div>
+      <h1>Panel de control</h1>
+      <p class="sub">Tu situación económica de {{ dashboard() ? 'este mes' : '' }}</p>
+    </div>
+    @if (!editingSaldo()) {
+      <button class="btn-secondary" (click)="abrirEditarSaldo()">Ajustar saldo inicial</button>
+    }
+  </header>
+
+  <div class="cards">
+    <div class="card card-patrimonio">
+      <div class="card-label">Patrimonio total</div>
+      <div class="card-value">{{ patrimonio() | number: '1.2-2' }} €</div>
+      <div class="card-note">Saldo inicial {{ dashboard()?.saldoInicial | number: '1.2-2' }} €</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Ingresos del mes</div>
+      <div class="card-value pos">+{{ resumen()?.ingresos | number: '1.2-2' }} €</div>
+      @if (comparativa()?.ingresosDeltaPct != null) {
+        <div class="card-note" [class.up]="(comparativa()?.ingresosDeltaPct ?? 0) >= 0" [class.down]="(comparativa()?.ingresosDeltaPct ?? 0) < 0">
+          {{ (comparativa()?.ingresosDeltaPct ?? 0) >= 0 ? '▲' : '▼' }} {{ (comparativa()?.ingresosDeltaPct ?? 0) | number: '1.1-1' }}% vs mes anterior
+        </div>
+      }
+    </div>
+    <div class="card">
+      <div class="card-label">Gastos del mes</div>
+      <div class="card-value neg">−{{ resumen()?.gastos | number: '1.2-2' }} €</div>
+      @if (comparativa()?.gastosDeltaPct != null) {
+        <div class="card-note" [class.down]="(comparativa()?.gastosDeltaPct ?? 0) >= 0" [class.up]="(comparativa()?.gastosDeltaPct ?? 0) < 0">
+          {{ (comparativa()?.gastosDeltaPct ?? 0) >= 0 ? '▲' : '▼' }} {{ (comparativa()?.gastosDeltaPct ?? 0) | number: '1.1-1' }}% vs mes anterior
+        </div>
+      }
+    </div>
+    <div class="card">
+      <div class="card-label">Balance mensual</div>
+      <div class="card-value" [class.pos]="(resumen()?.balance ?? 0) >= 0" [class.neg]="(resumen()?.balance ?? 0) < 0">
+        {{ resumen()?.balance | number: '1.2-2' }} €
+      </div>
+      <div class="card-note">Tasa de ahorro: {{ resumen()?.tasaAhorro | number: '1.1-1' }}%</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Ahorro del mes</div>
+      <div class="card-value pos">+{{ resumen()?.ahorros | number: '1.2-2' }} €</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Invertido este mes</div>
+      <div class="card-value">{{ resumen()?.inversiones | number: '1.2-2' }} €</div>
+    </div>
+  </div>
+
+  <div class="charts">
+    <div class="chart-box chart-wide">
+      <h2>Gastos vs ingresos por día</h2>
+      <div class="chart-canvas">
+        <canvas baseChart [data]="chartMensualData()" [options]="chartMensualOptions" [type]="chartMensualType"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <h2>Evolución de inversiones</h2>
+      <div class="chart-canvas">
+        @if (evolucionInversiones().length) {
+          <canvas baseChart [data]="chartInvData()" [options]="chartInvOptions" [type]="chartInvType"></canvas>
+        } @else {
+          <p class="empty">Aún no hay inversiones registradas.</p>
+        }
+      </div>
+    </div>
+
+    <div class="chart-box chart-wide">
+      <h2>Últimos 12 meses</h2>
+      <div class="chart-canvas">
+        <canvas baseChart [data]="chart12Data()" [options]="chart12Options" [type]="chart12Type"></canvas>
+      </div>
+    </div>
+  </div>
+
+  @if (editingSaldo()) {
+    <div class="modal-overlay" (click)="editingSaldo.set(false)">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Ajustar saldo inicial</h3>
+        <p class="modal-sub">Saldo inicial con el que parte tu patrimonio.</p>
+        <label>
+          Saldo inicial (€)
+          <input type="number" step="0.01" min="0" [(ngModel)]="nuevoSaldo" (keyup.enter)="guardarSaldo()" />
+        </label>
+        @if (saldoError()) {
+          <p class="modal-error">{{ saldoError() }}</p>
+        }
+        <div class="modal-actions">
+          <button class="btn-guardar" (click)="guardarSaldo()">Guardar</button>
+          <button class="btn-cancelar" (click)="editingSaldo.set(false)">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
