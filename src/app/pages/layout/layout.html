@@ -1,5 +1,13 @@
 <div class="layout">
-  <aside class="sidebar">
+  <button class="menu-toggle" (click)="toggleMenu()" aria-label="Abrir menú">
+    <span></span><span></span><span></span>
+  </button>
+
+  @if (menuAbierto()) {
+    <div class="overlay" (click)="toggleMenu()"></div>
+  }
+
+  <aside class="sidebar" [class.open]="menuAbierto()">
     <div class="brand">
       <span class="brand-icon">💰</span>
       <span class="brand-text">Finanzas</span>
