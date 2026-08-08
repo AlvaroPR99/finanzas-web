@@ -6,6 +6,7 @@ import { LayoutComponent } from './pages/layout/layout';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { MovimientosComponent } from './pages/movimientos/movimientos';
 import { RecurrentesComponent } from './pages/recurrentes/recurrentes';
+import { ActualizacionesComponent } from './pages/actualizaciones/actualizaciones';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
       { path: 'ahorros', component: MovimientosComponent, data: { tipo: 'AHORRO' } },
       { path: 'inversiones', component: MovimientosComponent, data: { tipo: 'INVERSION' } },
       { path: 'recurrentes', component: RecurrentesComponent },
+      { path: 'novedades', component: ActualizacionesComponent },
     ],
   },
   { path: '**', redirectTo: '' },

@@ -48,7 +48,9 @@ export interface Inversion {
   porcentaje: number;
   descripcion: string;
   categoria: Categoria | null;
-  fecha: string;
+  fecha: string | null;
+  esInicial: boolean;
+  padreId: number | null;
   valorActual: number;
 }
 
@@ -76,7 +78,9 @@ export interface InversionRequest {
   porcentaje: number;
   descripcion: string;
   categoriaId: number | null;
-  fecha: string;
+  fecha: string | null;
+  esInicial: boolean;
+  padreId: number | null;
 }
 
 export interface RecurrenteRequest {
@@ -125,6 +129,7 @@ export interface InversionData {
 
 export interface DashboardResponse {
   patrimonio: number;
+  disponible: number;
   saldoInicial: number;
   mes: ResumenMes;
   comparativa: Comparativa;

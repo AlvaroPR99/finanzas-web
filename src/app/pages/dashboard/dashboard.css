@@ -46,6 +46,25 @@ h1 {
   color: #fff;
 }
 
+.card-disponible {
+  background: #1b1b1b;
+  border-color: #1b1b1b;
+  color: #fff;
+}
+
+.card-disponible .card-label,
+.card-disponible .card-note {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.card-disponible .card-value {
+  color: #fff;
+}
+
+.card-disponible .card-value.neg {
+  color: #ff8a80;
+}
+
 .card-label {
   font-size: 11px;
   text-transform: uppercase;

@@ -26,13 +26,16 @@ const CONFIGS: Record<string, Config> = {
 
 interface Row {
   id: number;
-  fecha: string;
+  fecha: string | null;
   descripcion: string;
   categoria: Categoria | null;
   monto: number;
+  baseMonto?: number;
   tipoGasto?: string;
   porcentaje?: number;
   valorActual?: number;
+  esInicial?: boolean;
+  padreId?: number | null;
 }
 
 const MESES_NOMBRE = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -75,7 +78,10 @@ export class MovimientosComponent implements OnInit {
     categoriaId: null as number | null,
     tipoGasto: 'VARIABLE',
     porcentaje: 0,
-    fecha: new Date().toISOString().slice(0, 10),
+    esInicial: false,
+    padreId: null as number | null,
+    tipoInversion: 'nueva' as 'nueva' | 'previa' | 'aporte',
+    fecha: new Date().toISOString().slice(0, 10) as string | null,
   };
 
   ngOnInit(): void {
@@ -107,9 +113,16 @@ export class MovimientosComponent implements OnInit {
       next: (list: any[]) => {
         const rows = list.map(i => this.toRow(i));
         this.rows.set(rows);
-        this.grupos.set(this.config.agruparPorMes ? this.agruparPorMes(rows) : this.agruparInversiones(rows));
-        this.total.set(rows.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0));
-        this.totalActual.set(rows.reduce((acc, r) => acc + (r.valorActual ?? 0), 0));
+        if (this.config.tipo === 'INVERSION') {
+          const padres = this.inversionesPadresConTotal(rows);
+          this.grupos.set(this.agruparInversiones(rows));
+          this.total.set(padres.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0));
+          this.totalActual.set(padres.reduce((acc, r) => acc + (r.valorActual ?? 0), 0));
+        } else {
+          this.grupos.set(this.agruparPorMes(rows));
+          this.total.set(rows.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0));
+          this.totalActual.set(rows.reduce((acc, r) => acc + (r.valorActual ?? 0), 0));
+        }
         this.loading.set(false);
       },
       error: () => {
@@ -120,14 +133,62 @@ export class MovimientosComponent implements OnInit {
   }
 
   private agruparInversiones(rows: Row[]): MesGrupo[] {
-    const ordenadas = [...rows].sort((a, b) => b.fecha.localeCompare(a.fecha));
-    return [{
-      clave: 'inversiones',
-      etiqueta: 'Todas las inversiones',
-      esActual: false,
-      registros: ordenadas,
-      total: ordenadas.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0),
-    }];
+    const padres = this.inversionesPadresConTotal(rows);
+    const aportes = rows.filter(r => r.padreId);
+
+    const padresOrdenadas = [...padres].sort((a, b) => {
+      if (!a.fecha) return 1;
+      if (!b.fecha) return -1;
+      return b.fecha.localeCompare(a.fecha);
+    });
+
+    const grupos: MesGrupo[] = [];
+    if (padresOrdenadas.length > 0) {
+      grupos.push({
+        clave: 'inversiones',
+        etiqueta: 'Inversiones',
+        esActual: false,
+        registros: padresOrdenadas,
+        total: padresOrdenadas.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0),
+      });
+    }
+    return [...grupos, ...this.agruparPorMes(aportes)];
+  }
+
+  private inversionesPadresConTotal(rows: Row[]): Row[] {
+    const padres = rows.filter(r => !r.padreId);
+    return padres.map(p => {
+      const sumaAportes = rows
+        .filter(a => a.padreId === p.id)
+        .reduce((acc, a) => acc + (a.monto > 0 ? a.monto : 0), 0);
+      const montoTotal = (p.monto > 0 ? p.monto : 0) + sumaAportes;
+      const pct = p.porcentaje ?? 0;
+      return { ...p, monto: montoTotal, baseMonto: p.monto, valorActual: montoTotal * (1 + pct / 100) };
+    });
+  }
+
+  padres(): Row[] {
+    return this.rows().filter(r => !r.padreId);
+  }
+
+  onTipoChange(): void {
+    if (this.form.tipoInversion === 'previa') {
+      this.form.esInicial = true;
+      this.form.fecha = null;
+    } else {
+      this.form.esInicial = false;
+      this.form.fecha = this.form.fecha ?? new Date().toISOString().slice(0, 10);
+    }
+  }
+
+  onPadreChange(): void {
+    const padre = this.rows().find(r => r.id === this.form.padreId);
+    if (padre) {
+      this.form.descripcion = padre.descripcion
+        ? `Aporte a ${padre.descripcion}`
+        : 'Aporte a inversión';
+      this.form.categoriaId = padre.categoria?.id ?? this.categorias()[0]?.id ?? null;
+    }
   }
 
   private etiquetaMes(clave: string): string {
@@ -139,7 +200,7 @@ export class MovimientosComponent implements OnInit {
     const mesActual = new Date().toISOString().slice(0, 7);
     const porMes = new Map<string, Row[]>();
     for (const r of rows) {
-      const clave = r.fecha.slice(0, 7);
+      const clave = r.fecha ? r.fecha.slice(0, 7) : '';
       const arr = porMes.get(clave) ?? [];
       arr.push(r);
       porMes.set(clave, arr);
@@ -177,6 +238,8 @@ export class MovimientosComponent implements OnInit {
       tipoGasto: (item as Gasto).tipoGasto,
       porcentaje: (item as Inversion).porcentaje,
       valorActual: (item as Inversion).valorActual,
+      esInicial: (item as Inversion).esInicial,
+      padreId: (item as Inversion).padreId,
     };
   }
 
@@ -189,6 +252,9 @@ export class MovimientosComponent implements OnInit {
       categoriaId: this.categorias()[0]?.id ?? null,
       tipoGasto: 'VARIABLE',
       porcentaje: 0,
+      esInicial: false,
+      padreId: null,
+      tipoInversion: 'nueva',
       fecha: new Date().toISOString().slice(0, 10),
     };
     this.formOpen.set(true);
@@ -198,12 +264,15 @@ export class MovimientosComponent implements OnInit {
     this.editId.set(row.id);
     this.error.set('');
     this.form = {
-      monto: row.monto,
+      monto: row.baseMonto ?? row.monto,
       descripcion: row.descripcion,
       categoriaId: row.categoria?.id ?? null,
       tipoGasto: row.tipoGasto ?? 'VARIABLE',
       porcentaje: row.porcentaje ?? 0,
-      fecha: row.fecha,
+      esInicial: row.esInicial ?? false,
+      padreId: row.padreId ?? null,
+      tipoInversion: row.esInicial ? 'previa' : (row.padreId ? 'aporte' : 'nueva'),
+      fecha: row.fecha ?? new Date().toISOString().slice(0, 10),
     };
     this.formOpen.set(true);
   }
@@ -219,6 +288,10 @@ export class MovimientosComponent implements OnInit {
       this.error.set('El importe debe ser positivo');
       return;
     }
+    if (this.config.hasPorcentaje && this.form.tipoInversion === 'aporte' && !this.form.padreId) {
+      this.error.set('Selecciona la inversión a la que aportar');
+      return;
+    }
     this.saving.set(true);
     this.error.set('');
     const payload: any = {
@@ -232,7 +305,10 @@ export class MovimientosComponent implements OnInit {
     }
     if (this.config.hasPorcentaje) {
       payload.montoInvertido = this.form.monto;
-      payload.porcentaje = this.form.porcentaje;
+      payload.esInicial = this.form.tipoInversion === 'previa';
+      payload.padreId = this.form.tipoInversion === 'aporte' ? this.form.padreId : null;
+      payload.porcentaje = this.form.tipoInversion === 'aporte' ? 0 : this.form.porcentaje;
+      payload.fecha = this.form.tipoInversion === 'previa' ? null : this.form.fecha;
       delete payload.monto;
     }
     const id = this.editId();

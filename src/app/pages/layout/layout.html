@@ -20,6 +20,7 @@
       <a routerLink="/ahorros" routerLinkActive="active">🐷 Ahorros</a>
       <a routerLink="/inversiones" routerLinkActive="active">📈 Inversiones</a>
       <a routerLink="/recurrentes" routerLinkActive="active">🔄 Recurrentes</a>
+      <a routerLink="/novedades" routerLinkActive="active">📢 Novedades</a>
     </nav>
 
     <div class="sidebar-foot">
@@ -28,7 +29,7 @@
         <div class="user-role">Saldo inicial: {{ auth.user()?.saldoInicial }} €</div>
       </div>
       <button class="logout" (click)="logout()">Salir</button>
-      <div class="version">v1.1</div>
+      <div class="version">v1.2</div>
     </div>
   </aside>
 
