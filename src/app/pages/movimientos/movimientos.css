@@ -64,6 +64,34 @@ input, select {
   text-transform: none;
 }
 
+.check-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #333;
+}
+
+.check-label input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.form-note {
+  margin: 0;
+  padding: 9px 10px;
+  background: #f5f5f5;
+  border: 1px dashed #ddd;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #777;
+}
+
 input:focus, select:focus {
   outline: none;
   border-color: #000;
@@ -154,6 +182,9 @@ input:focus, select:focus {
 
 .mes-grupo {
   margin-bottom: 28px;
+  border: 1px solid #e5e5e5;
+  padding: 16px;
+  background: #fff;
 }
 
 .mes-grupo:last-child {
@@ -164,12 +195,10 @@ input:focus, select:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 0 8px;
+  padding: 0 0 8px;
   border-bottom: 2px solid #000;
   margin-bottom: 4px;
-}
-
-.mes-titulo {
+}.mes-titulo {
   font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
@@ -190,6 +219,22 @@ input:focus, select:focus {
   background: #000;
   color: #fff;
   border-color: #000;
+}
+
+.tag-previa {
+  margin-left: 8px;
+  background: #f2f2f2;
+  color: #555;
+  border-color: #ddd;
+  vertical-align: middle;
+}
+
+.tag-aporte {
+  margin-left: 8px;
+  background: #000;
+  color: #fff;
+  border-color: #000;
+  vertical-align: middle;
 }
 
 .table th {

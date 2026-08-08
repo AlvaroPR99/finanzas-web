@@ -15,6 +15,11 @@
       <div class="card-value">{{ patrimonio() | number: '1.2-2' }} €</div>
       <div class="card-note">Saldo inicial {{ dashboard()?.saldoInicial | number: '1.2-2' }} €</div>
     </div>
+    <div class="card card-disponible">
+      <div class="card-label">Dinero disponible</div>
+      <div class="card-value" [class.neg]="(disponible() ?? 0) < 0">{{ disponible() | number: '1.2-2' }} €</div>
+      <div class="card-note">Sin contar ahorros e inversiones</div>
+    </div>
     <div class="card">
       <div class="card-label">Ingresos del mes</div>
       <div class="card-value pos">+{{ resumen()?.ingresos | number: '1.2-2' }} €</div>

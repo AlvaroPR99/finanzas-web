@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit {
   nuevoSaldo = 0;
 
   readonly patrimonio = computed(() => this.dashboard()?.patrimonio ?? 0);
+  readonly disponible = computed(() => this.dashboard()?.disponible ?? 0);
   readonly resumen = computed(() => this.dashboard()?.mes);
   readonly comparativa = computed(() => this.dashboard()?.comparativa);
   readonly serieDiaria = computed(() => this.dashboard()?.serieDiaria ?? []);

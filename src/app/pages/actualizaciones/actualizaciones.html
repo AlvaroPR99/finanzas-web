@@ -1,0 +1,20 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <h1>Novedades</h1>
+      <p class="sub">Resumen de las últimas actualizaciones</p>
+    </div>
+  </header>
+
+  @for (v of versiones; track v.numero) {
+    <section class="panel">
+      <h2>{{ v.numero }}</h2>
+      <p class="desc">{{ v.descripcion }}</p>
+      <ul>
+        @for (c of v.cambios; track c) {
+          <li>{{ c }}</li>
+        }
+      </ul>
+    </section>
+  }
+</div>
