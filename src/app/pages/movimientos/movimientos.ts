@@ -70,6 +70,10 @@ export class MovimientosComponent implements OnInit {
   error = signal('');
   saving = signal(false);
 
+  filtroCategoria = signal<string>('TODAS');
+  filtroTipo = signal<string>('TODOS');
+  filtroMes = signal<string>('TODOS');
+
   formOpen = signal(false);
   editId = signal<number | null>(null);
   form = {
@@ -113,16 +117,7 @@ export class MovimientosComponent implements OnInit {
       next: (list: any[]) => {
         const rows = list.map(i => this.toRow(i));
         this.rows.set(rows);
-        if (this.config.tipo === 'INVERSION') {
-          const padres = this.inversionesPadresConTotal(rows);
-          this.grupos.set(this.agruparInversiones(rows));
-          this.total.set(padres.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0));
-          this.totalActual.set(padres.reduce((acc, r) => acc + (r.valorActual ?? 0), 0));
-        } else {
-          this.grupos.set(this.agruparPorMes(rows));
-          this.total.set(rows.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0));
-          this.totalActual.set(rows.reduce((acc, r) => acc + (r.valorActual ?? 0), 0));
-        }
+        this.recargarGrupos();
         this.loading.set(false);
       },
       error: () => {
@@ -214,6 +209,85 @@ export class MovimientosComponent implements OnInit {
         registros: regs,
         total: regs.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0),
       }));
+  }
+
+  get hasFiltros(): boolean {
+    return this.config.tipo === 'GASTO';
+  }
+
+  get mesesDisponibles(): string[] {
+    const set = new Set<string>();
+    for (const r of this.rows()) {
+      if (r.fecha) set.add(r.fecha.slice(0, 7));
+    }
+    return [...set].sort((a, b) => b.localeCompare(a));
+  }
+
+  get filtroActivo(): boolean {
+    return this.filtroCategoria() !== 'TODAS' || this.filtroTipo() !== 'TODOS' || this.filtroMes() !== 'TODOS';
+  }
+
+  private filtrar(rows: Row[]): Row[] {
+    return rows.filter(r => {
+      if (this.filtroCategoria() !== 'TODAS' && r.categoria?.id !== Number(this.filtroCategoria())) return false;
+      if (this.filtroTipo() !== 'TODOS' && (r.tipoGasto ?? '') !== this.filtroTipo()) return false;
+      if (this.filtroMes() !== 'TODOS' && (r.fecha ? r.fecha.slice(0, 7) : '') !== this.filtroMes()) return false;
+      return true;
+    });
+  }
+
+  resumenPorCategoria(): { categoria: string; icono: string; monto: number; pct: number }[] {
+    if (!this.hasFiltros) return [];
+    const rows = this.filtrar(this.rows());
+    const total = rows.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0);
+    const porCat = new Map<string, { categoria: string; icono: string; monto: number }>();
+    for (const r of rows) {
+      const key = r.categoria ? String(r.categoria.id) : 'sin-cat';
+      const nombre = r.categoria?.nombre ?? 'Sin categoría';
+      const icono = r.categoria?.icono ?? '—';
+      const cur = porCat.get(key) ?? { categoria: nombre, icono, monto: 0 };
+      cur.monto += r.monto > 0 ? r.monto : 0;
+      porCat.set(key, cur);
+    }
+    return [...porCat.values()]
+      .sort((a, b) => b.monto - a.monto)
+      .map(x => ({ ...x, pct: total > 0 ? (x.monto / total) * 100 : 0 }));
+  }
+
+  resumenPorTipo(): { tipo: string; monto: number; pct: number }[] {
+    if (!this.hasFiltros) return [];
+    const rows = this.filtrar(this.rows());
+    const total = rows.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0);
+    const porTipo = new Map<string, number>();
+    for (const r of rows) {
+      const tipo = r.tipoGasto === 'FIJO' ? 'Fijo' : 'Variable';
+      porTipo.set(tipo, (porTipo.get(tipo) ?? 0) + (r.monto > 0 ? r.monto : 0));
+    }
+    return [...porTipo.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([tipo, monto]) => ({ tipo, monto, pct: total > 0 ? (monto / total) * 100 : 0 }));
+  }
+
+  aplicarFiltro(): void {
+    this.recargarGrupos();
+  }
+
+  limpiarFiltros(): void {
+    this.filtroCategoria.set('TODAS');
+    this.filtroTipo.set('TODOS');
+    this.filtroMes.set('TODOS');
+    this.recargarGrupos();
+  }
+
+  private recargarGrupos(): void {
+    const rows = this.filtrar(this.rows());
+    if (this.config.tipo === 'INVERSION') {
+      this.grupos.set(this.agruparInversiones(rows));
+    } else {
+      this.grupos.set(this.agruparPorMes(rows));
+    }
+    this.total.set(rows.reduce((acc, r) => acc + (r.monto > 0 ? r.monto : 0), 0));
+    this.totalActual.set(rows.reduce((acc, r) => acc + (r.valorActual ?? 0), 0));
   }
 
   private listMethod(): 'listarIngresos' | 'listarGastos' | 'listarAhorros' | 'listarInversiones' {
