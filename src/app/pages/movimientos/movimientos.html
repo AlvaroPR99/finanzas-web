@@ -13,6 +13,70 @@
     <p class="error-banner">{{ error() }}</p>
   }
 
+  @if (hasFiltros) {
+    <section class="panel filtros-panel">
+      <h2>Filtros</h2>
+      <div class="filtros">
+        <label>
+          Categoría
+          <select [(ngModel)]="filtroCategoria" name="filtroCategoria" (ngModelChange)="aplicarFiltro()">
+            <option value="TODAS">Todas</option>
+            <option *ngFor="let c of categorias()" [value]="c.id">{{ c.icono }} {{ c.nombre }}</option>
+          </select>
+        </label>
+        <label>
+          Tipo
+          <select [(ngModel)]="filtroTipo" name="filtroTipo" (ngModelChange)="aplicarFiltro()">
+            <option value="TODOS">Todos</option>
+            <option value="FIJO">Fijo</option>
+            <option value="VARIABLE">Variable</option>
+          </select>
+        </label>
+        <label>
+          Mes
+          <select [(ngModel)]="filtroMes" name="filtroMes" (ngModelChange)="aplicarFiltro()">
+            <option value="TODOS">Todos</option>
+            <option *ngFor="let m of mesesDisponibles" [value]="m">{{ m }}</option>
+          </select>
+        </label>
+        @if (filtroActivo) {
+          <button class="btn btn-outline btn-filtro" (click)="limpiarFiltros()">Limpiar filtros</button>
+        }
+      </div>
+
+      @if (resumenPorTipo().length > 0) {
+        <div class="resumen">
+          <div class="resumen-cols">
+            <div class="resumen-col">
+              <h3>Por tipo</h3>
+              @for (t of resumenPorTipo(); track t.tipo) {
+                <div class="resumen-row">
+                  <span class="resumen-label">{{ t.tipo }}</span>
+                  <div class="resumen-bar-wrap">
+                    <div class="resumen-bar" [style.width.%]="t.pct"></div>
+                  </div>
+                  <span class="resumen-num">{{ t.monto | number: '1.2-2' }} € · {{ t.pct | number: '1.0-0' }}%</span>
+                </div>
+              }
+            </div>
+            <div class="resumen-col">
+              <h3>Por categoría</h3>
+              @for (c of resumenPorCategoria(); track c.categoria) {
+                <div class="resumen-row">
+                  <span class="resumen-label"><span class="cat-icon">{{ c.icono }}</span> {{ c.categoria }}</span>
+                  <div class="resumen-bar-wrap">
+                    <div class="resumen-bar" [style.width.%]="c.pct"></div>
+                  </div>
+                  <span class="resumen-num">{{ c.monto | number: '1.2-2' }} € · {{ c.pct | number: '1.0-0' }}%</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </section>
+  }
+
   <section class="panel">
     <div class="table-head">
       <span>{{ rows().length }} registros</span>
